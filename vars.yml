@@ -1,0 +1,10 @@
+---
+dev_tools_packages:
+  - wget
+  - make
+  - cmake
+  - gcc
+  - bzip2-devel
+  - libffi-devel
+  - zlib-devel
+  - tar

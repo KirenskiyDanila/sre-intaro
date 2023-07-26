@@ -1,0 +1,4 @@
+export PGDATA={{ postgres_data_dir }}
+export PATH=$PATH:{{ postgres_bin_path }}
+export PGSETUP_INITDB_OPTIONS="--encoding='UTF-8' --lc-collate='en_US.UTF-8' --lc-ctype='en_US.UTF-8' --sync-only"
+

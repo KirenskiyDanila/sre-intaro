@@ -1,0 +1,34 @@
+- name: Get python 3.11 version
+  command: python3.11 --version
+  register: python_output
+  ignore_errors: true
+
+- name: Set python 3.11 version
+  set_fact:
+    python_version: '{{ python_output.stdout.split(" ")[1][:4] | default(0) }}'
+
+- name: Setup Python 3.11
+  import_tasks: python.yml
+  when: python_version != "3.11"
+
+- name: Install postgres repo
+  yum:
+    name:  https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+  become: true
+
+- name: Install dependencies
+  yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  become: true
+
+- name: Install epel-release
+  yum:
+    name: epel-release
+    state: latest
+  become: true
+
+- name: Install PostgreSQL package
+  yum:
+    name: postgresql14-server
+    state: latest
+  become: true

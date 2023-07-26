@@ -1,0 +1,5 @@
+nginx_domain: sre.local
+nginx_root: /var/www/sre/web
+nginx_php_address: 127.0.0.1:9000
+nginx_script_file: app.php
+nginx_host_ip: 127.0.0.1

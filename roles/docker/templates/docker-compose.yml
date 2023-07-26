@@ -1,0 +1,17 @@
+version: "3.1"
+
+services:
+    php:
+        build: docker/images/php
+        ports:
+        - "127.0.0.1:9000:9000"
+        working_dir: {{ docker_working_dir }}
+        volumes:
+            - ./:{{ docker_working_dir }}
+        environment:
+            - POSTGRES_HOST
+            - POSTGRES_DB
+            - POSTGRES_USER
+            - POSTGRES_PASSWORD
+        extra_hosts:
+            - "host.docker.internal:host-gateway"

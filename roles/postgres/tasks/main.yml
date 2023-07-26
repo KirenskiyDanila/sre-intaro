@@ -1,0 +1,15 @@
+---
+# Setup task.
+- include_tasks: setup.yml
+- include_tasks: initialize.yml
+
+- name: Ensure PostgreSQL is started and enabled on boot.
+  service:
+    name: postgresql-14.service
+    state: started
+    enabled: yes
+  become: true
+
+# Configure PostgreSQL.
+- import_tasks: databases.yml
+- import_tasks: user.yml
