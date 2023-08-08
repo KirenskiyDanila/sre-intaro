@@ -5,21 +5,6 @@
   become: true
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
 
-# Узнаем точную версию пакета для установки
-- name: Look for nginx package name
-  shell: "yum --showduplicates list nginx 2>/dev/null | grep {{ install_version }} | awk '{print $2}' | tail -n 1 | awk -F: '{print $2}'"
-  register: nginx_package_version
-  when: install_version is defined
-  check_mode: no
-
-- name: Install nginx certain version
-  yum:
-    name: "nginx-{{ nginx_package_version.stdout }}"
-    state: present
-  become: true
-  when: install_version is defined
-  register: nginx_installed
-
 - name: Install latest nginx
   yum:
     name: nginx
