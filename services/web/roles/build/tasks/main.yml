@@ -1,0 +1,36 @@
+---
+- name: Add IP address of host to hosts file
+  lineinfile:
+    dest: /etc/hosts
+    line: "{{ host_ip }} {{ domain }}"
+    state: present
+  become: yes
+
+- name: Copy php image file
+  copy:
+    src: docker
+    dest: "{{ sre_path }}"
+  become: yes
+
+- name: Copy docker-compose.yml file
+  template:
+    src: docker-compose.yml
+    dest: "{{ sre_path }}"
+  become: yes
+
+- name: Copy .env file
+  template:
+    src: .env
+    dest: "{{ sre_path }}"
+  become: yes
+
+- name: Get web project from git
+  git:
+    repo: https://github.com/KirenskiyDanila/web-sre
+    dest: {{ sre_path }}/web
+  become: yes
+
+- name: Recreate docker-compose
+  command: docker-compose up -d --build --force-recreate
+  args:
+    chdir: "{{ sre_path }}

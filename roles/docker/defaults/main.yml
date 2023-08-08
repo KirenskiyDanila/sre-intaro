@@ -1,6 +1,0 @@
----
-docker_working_dir: /var/www/sre
-docker_postgres_host: '172.17.0.1'
-docker_postgres_db: sre_intaro
-docker_postgres_user: postgres
-docker_postgres_password: postgres

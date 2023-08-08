@@ -1,0 +1,7 @@
+---
+- name: Install and build web
+  hosts: servers
+  roles:
+    - postgresql.add-database-and-tables
+    - services/web/roles/build
+  include_vars: app_vars/web.yml

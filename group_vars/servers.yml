@@ -1,0 +1,59 @@
+nginx_conf_header:
+  user: www
+  worker_processes: auto
+  worker_rlimit_nofile: 20960
+nginx_conf_server:
+  - { regexp: '^\s+access_log\s+', line: "access_log  /var/log/nginx/access.log   combined;" }
+  - { regexp: '^\s+error_log\s+', line: "error_log  /var/log/nginx/warn.log     warn;" }
+  - { regexp: '^\s+gzip\s+', line: "gzip on;" }
+  - { regexp: '^\s+gzip_min_length\s+', line: "gzip_min_length  1000;" }
+  - { regexp: '^\s+gzip_types\s+', line: "gzip_types  text/xml text/css;" }
+  - { regexp: '^\s+proxy_ignore_client_abort\s+', line: "proxy_ignore_client_abort on;" }
+nginx_conf_events:
+  - { regexp: '^\s*worker_connections\s+', line: "worker_connections  1024;" }
+  - { regexp: '^\s*multi_accept\s+', line: "multi_accept        on;  " }
+  - { regexp: '^\s*accept_mutex\s+', line: "accept_mutex        on;" }
+  - { regexp: '^\s*accept_mutex_delay\s+', line: "worker_connections  1024;" }
+nginx_default_conf:
+  - { regexp: '^\s*client_body_buffer_size\s+', line: "client_body_buffer_size 16k;" }
+  - { regexp: '^\s*client_max_body_size\s+', line: "client_max_body_size 2m;" }
+  - { regexp: '^\s*client_body_in_single_buffer\s+', line: "client_body_in_single_buffer on;" }
+  - { regexp: '^\s*client_body_temp_path\s+', line: "client_body_temp_path /var/nginx/client_body_temp;" }
+  - { regexp: '^\s*client_header_buffer_size\s+', line: "client_header_buffer_size  1m;" }
+  - { regexp: '^\s*large_client_header_buffers\s+', line: "large_client_header_buffers 4 8k;" }
+  - { regexp: '^\s*client_body_timeout\s+', line: "client_body_timeout 15s;" }
+  - { regexp: '^\s*client_header_timeout\s+', line: "client_header_timeout 15s;" }
+postgres_production_settings:
+  - name: max_connections
+    value: '200'
+  - name: shared_buffers
+    value: '160MB'
+  - name: effective_cache_size
+    value: '480MB'
+  - name: maintenance_work_mem
+    value: '40MB'
+  - name: checkpoint_completion_target
+    value: '0.9'
+  - name: wal_buffers
+    value: '4915kB'
+  - name: default_statistics_target
+    value: '100'
+  - name: random_page_cost
+    value: '1.1'
+  - name: effective_io_concurrency
+    value: '200'
+  - name: work_mem
+    value: '408kB'
+  - name: min_wal_size
+    value: '1GB'
+  - name: max_wal_size
+    value: '4GB'
+  - name: max_worker_processes
+    value: '4'
+  - name: max_parallel_workers_per_gather
+    value: '2'
+  - name: max_parallel_workers
+    value: '4'
+  - name: max_parallel_maintenance_workers
+    value: '2'
+

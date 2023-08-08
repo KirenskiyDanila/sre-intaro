@@ -1,0 +1,57 @@
+---
+- name: Install packages
+  yum:
+    name: "{{ packages }}"
+    state: present
+  become: yes
+  vars:
+    packages:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+
+- name: Add Docker repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+  become: yes
+
+- name: Install Docker
+  package:
+    name: "docker-ce-{{ docker_version }}"
+    state: present
+  become: yes
+
+- name: Start Docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Download docker-compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64"
+    dest: /tmp/docker-compose-Linux-x86_64
+  become: true
+  changed_when: false
+
+- name: Verify docker-compose checksum
+  shell: cd /tmp && echo {{ docker_compose_sha256 }} *docker-compose-Linux-x86_64 | sha256sum --check --status
+  changed_when: false
+
+- name: Copy docker-compose bin
+  copy:
+    remote_src: true
+    src: /tmp/docker-compose-Linux-x86_64
+    dest: /usr/bin/docker-compose
+    mode: 0655
+  become: true
+
+- name: Remove tmp docker-compose bin
+  file:
+    path: /tmp/docker-compose-Linux-x86_64
+    state: absent
+  become: true
+  changed_when: false
+

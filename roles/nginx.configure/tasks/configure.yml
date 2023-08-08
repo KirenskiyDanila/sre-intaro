@@ -1,0 +1,56 @@
+---
+- name: Configure nginx - header
+  lineinfile:
+    dest: "/etc/nginx/nginx.conf"
+    regexp: '^{{ item }}\s+\w+'
+    line: "{{ item }} {{ nginx_conf_header[item] }};"
+  with_items:
+    - user
+    - worker_processes
+    - worker_rlimit_nofile
+  become: true
+
+- name: Configure nginx - events
+  lineinfile:
+    dest: "/etc/nginx/nginx.conf"
+    insertafter: '^\s*events {'
+    regexp: '{{ item.regexp }}'
+    line: "\t{{ item.line }}"
+  with_items: "{{ nginx_conf_events }}"
+  become: true
+  when: "nginx_install.accept_mutex is defined"
+  notify:
+    - Reload Nginx
+
+- name: Configure nginx - server
+  lineinfile:
+    dest: "/etc/nginx/nginx.conf"
+    insertafter: '^\s+keepalive_timeout'
+    regexp: '{{ item.regexp }}'
+    line: "\t{{ item.line }}"
+  with_items: "{{ nginx_conf_server }}"
+  become: true
+  when: "nginx_install.accept_mutex is defined"
+  notify:
+    - Reload Nginx
+
+- name: Add nginx conf.d
+  template:
+    src: {{ path_to_default.conf }}
+    dest: /etc/nginx/conf.d
+    mode: 0755
+  notify: Restart nginx
+  become: yes
+
+- name: Configure default.conf
+  lineinfile:
+    dest: "/etc/nginx/nginx.conf"
+    insertafter: '^\s*events {'
+    regexp: '{{ item.regexp }}'
+    line: "\t{{ item.line }}"
+  with_items: "{{ nginx_default_conf }}"
+  become: true
+  when: "nginx_install.accept_mutex is defined"
+  notify:
+    - Reload Nginx
+

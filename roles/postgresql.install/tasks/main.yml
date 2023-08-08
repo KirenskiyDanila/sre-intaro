@@ -1,0 +1,78 @@
+- name: Install pg python prerequisites
+  become: true
+  yum:
+    name: "{{ packages }}"
+    state: latest
+  vars:
+    packages:
+      - python-psycopg2
+  changed_when: false
+
+- name: Install postgres repo
+  yum:
+    name:  https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+  become: true
+
+- name: Install PostgreSQL packages
+  yum:
+    name: "{{ packages }}"
+    state: present
+  become: true
+  vars:
+      packages:
+        - "postgresql{{ postgresql_version }}-server"
+        - "postgresql{{ postgresql_version }}-contrib"
+
+- name: Set PostgreSQL environment variables.
+  template:
+    src: postgres.sh.j2
+    dest: /etc/profile.d/postgres.sh
+    mode: 0644
+  become: true
+
+- name: Ensure PostgreSQL data directory exists.
+  file:
+    path: "{{ postgres_data_dir }}"
+    state: directory
+  become: true
+
+- name: Check if PostgreSQL database is initialized.
+  stat:
+    path: "{{ postgres_data_dir }}/PG_VERSION"
+  register: pgdata_dir_version
+  become: true
+
+- name: Ensure PostgreSQL database is initialized.
+  command: "{{ postgres_bin_path }}/postgresql-14-setup initdb"
+  when: not pgdata_dir_version.stat.exists
+  become: true
+  # See: https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true
+
+- name: Ensure PostgreSQL service is enabled
+  service:
+    name: "postgresql-{{ postgresql_version }}"
+    state: started
+    enabled: yes
+  become: true
+
+- name: Ensure PostgreSQL log directory exists.
+  file:
+    path: "{{ postgres_data_dir }}/pg_log"
+    state: directory
+  become: true
+
+# - name: Ensure we have listen_addresses line in postgresql.conf file
+#  lineinfile:
+#    path: "{{ postgres_data_dir }}/postgresql.conf"
+#    line: "listen_addresses = '*'"
+#    regexp: "^listen_addresses = \\'\\*\\'$"
+#  become: true
+
+- name: Ensure we have IPv4 line for docker-network in pg_hba.conf
+  lineinfile:
+    path: "{{ postgres_data_dir }}/pg_hba.conf"
+    line: 'host    all            all             172.0.0.0/8                scram-sha-256'
+    regexp: '^host( )+all( )+all( )+127.0.0.1\/32( )+scram-sha-256$'
+  become: true

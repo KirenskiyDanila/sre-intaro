@@ -1,0 +1,10 @@
+---
+- name: Set production settings
+  postgresql_set:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+  with_items:
+    - "{{ postgres_production_settings }}"
+  become: true
+  become_user: "{{ postgres_user }}"
+  notify: Restart postgres

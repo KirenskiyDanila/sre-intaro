@@ -1,0 +1,13 @@
+---
+- name: Install and build web
+  hosts: servers
+  roles:
+    - nginx.install
+    - nginx.configure
+    - docker.install
+    - postgresql.install
+    - postgresql.configure.user
+    - postgresql.configure.prod
+    - postgresql.add-database-and-tables
+    - services/web/roles/build
+  include_vars: app_vars/web.yml

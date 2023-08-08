@@ -1,0 +1,10 @@
+---
+docker_working_dir: /var/www/sre
+docker_postgres_host: '172.17.0.1'
+docker_postgres_db: sre_intaro
+docker_postgres_user: postgres
+docker_postgres_password: postgres
+
+docker_version: 20.10.23
+docker_compose_version: 1.28.2
+docker_compose_sha256: e984402b96bb923319f8ac95c8d26944e12d15692ab0fea4fff63ddfd5fd8d64

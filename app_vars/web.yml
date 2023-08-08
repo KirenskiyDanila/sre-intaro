@@ -1,0 +1,12 @@
+---
+postgres_db_name: sre_intaro
+postgres_db_tables:
+  - name: author
+    columns:
+    - id bigserial primary key
+    - name varchar
+domain: sre.local
+root: /var/www/sre/web
+script_file: app.php
+script_file_regex: ^/app\.php(/|$)
+php_address: 127.0.0.1:9000

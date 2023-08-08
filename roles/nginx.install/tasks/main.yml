@@ -1,0 +1,73 @@
+---
+- name: Install nginx repo for CentOS 7
+  yum:
+    name: "http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-{{ ansible_distribution_major_version }}-0.el{{ ansible_distribution_major_version }}.ngx.noarch.rpm"
+  become: true
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+
+# Узнаем точную версию пакета для установки
+- name: Look for nginx package name
+  shell: "yum --showduplicates list nginx 2>/dev/null | grep {{ install_version }} | awk '{print $2}' | tail -n 1 | awk -F: '{print $2}'"
+  register: nginx_package_version
+  when: install_version is defined
+  check_mode: no
+
+- name: Install nginx certain version
+  yum:
+    name: "nginx-{{ nginx_package_version.stdout }}"
+    state: present
+  become: true
+  when: install_version is defined
+  register: nginx_installed
+
+- name: Install latest nginx
+  yum:
+    name: nginx
+    state: present
+  become: true
+  when: install_version is not defined
+  register: nginx_installed
+
+- name: Ensure that nginx service is active
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Create /var/nginx dir
+  file:
+    path: /var/nginx
+    state: directory
+    mode: '0755'
+  become: yes
+
+- name: Create dir for storing temporary request bodies
+  file:
+    path: /var/nginx/client_body_temp
+    state: directory
+    mode: '0755'
+  become: yes
+
+- name: Check log dir
+  file:
+    path: /var/log/nginx
+    state: directory
+    mode: '0755'
+    owner: "{{ ansible_user_id }}"
+  become: yes
+
+- name: Create access.log
+  file:
+    path: /var/log/nginx/access.log
+    state: touch
+    mode: '0755'
+    owner: "{{ ansible_user_id }}"
+  become: yes
+
+- name: Permit traffic in default zone for service
+  ansible.posix.firewalld:
+    service: http
+    permanent: true
+    state: enabled
+  become: yes
