@@ -27,10 +27,10 @@
 - name: Get web project from git
   git:
     repo: https://github.com/KirenskiyDanila/web-sre
-    dest: {{ sre_path }}/web
+    dest: "{{ sre_path }}/web"
   become: yes
 
 - name: Recreate docker-compose
   command: docker-compose up -d --build --force-recreate
   args:
-    chdir: "{{ sre_path }}
+    chdir: "{{ sre_path }}"

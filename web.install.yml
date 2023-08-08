@@ -1,6 +1,8 @@
 ---
 - name: Install and build web
   hosts: servers
+  pre_tasks:
+    - include_vars: app_vars/web.yml
   roles:
     - nginx.install
     - nginx.configure
@@ -10,4 +12,3 @@
     - postgresql.configure.prod
     - postgresql.add-database-and-tables
     - services/web/roles/build
-  include_vars: app_vars/web.yml
